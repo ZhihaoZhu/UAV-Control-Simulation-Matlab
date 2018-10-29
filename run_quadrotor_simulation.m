@@ -1,6 +1,7 @@
 close all;
 clear;
 clc;
+clc;
 
 %% True plant parameters
 plant_params = struct(...
