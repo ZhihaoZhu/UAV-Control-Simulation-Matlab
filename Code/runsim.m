@@ -1,5 +1,3 @@
-
-
 % Simulation times, in seconds. 
 start_time = 0; 
 end_time = 20; 

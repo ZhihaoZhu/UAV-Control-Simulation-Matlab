@@ -1,4 +1,3 @@
-
 %% The physical model of the Quadcopter
 % Using the "Newton-Euler Equations"
 % input: 4*force of each motor, X(time) state of the Quadcopter (The linear velocity)
