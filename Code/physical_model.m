@@ -3,7 +3,7 @@
 % input: 4*force of each motor, X(time) state of the Quadcopter (The linear velocity)
 % output: the dX(time) of the Quadcopter (The linear acceleration)
 
-function sdot = physical_model(iter, F_act,M_act,s,plant_params)
+function sdot = physical_model(iter, F_act, M_act, s, plant_params)
 	% Assign states
 	phi = s(7);
 	theta = s(8);

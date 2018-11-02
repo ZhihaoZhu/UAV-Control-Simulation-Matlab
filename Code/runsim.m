@@ -72,7 +72,8 @@ for iter = 1:N-1
 
     % generate coefficient for trajectore generator --- alpha;
 %     line_traGenerator(iter, time, end_time)
-    wp_traGenerator(iter, time, end_time);
+%     wp_traGenerator(iter, time, end_time);
+    hover(iter);
 
     % generate the Force and Torque
     [F_des, M_des] = controller(iter, ctrl, plant_params); % generate force, torque
@@ -103,27 +104,26 @@ des_y = des_state.pos(2,:);
 des_z = des_state.pos(3,:);
 
 
-plot(x);
-hold on
-plot(y);
-hold on
-plot(z);
-hold on;
-plot(des_state.pos(1,:));
-hold on;
-plot(des_state.pos(2,:));
-hold on;
-plot(des_state.pos(3,:));
-hold on;
-% plot(des_state.acc(2,:));
-  
-% plot3(x,y,z)
+% plot(x);
 % hold on
-% plot3(des_x,des_y,des_z)
-% view([30,30,45])
-% axis equal;
+% plot(y);
+% hold on
+% plot(z);
+% hold on;
+% plot(des_state.pos(1,:));
+% hold on;
+% plot(des_state.pos(2,:));
+% hold on;
+% plot(des_state.pos(3,:));
+% hold on;
+
+
+plot(des_state.acc(2,:)); 
+plot3(x,y,z)
+hold on
+plot3(des_x,des_y,des_z)
+view([30,30,45])
+axis equal;
 
 grid on;
 grid minor;
-
-

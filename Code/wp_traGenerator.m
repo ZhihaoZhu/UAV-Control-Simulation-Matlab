@@ -17,8 +17,7 @@ function wp_traGenerator(iter,time,T)
 			 0 1 0 0;
 			 0 1 2 3;];
           
-            
-
+        
 		B1 = [waypoint(1,:);waypoint(2,:);zeros(1,3);[0,1.4,0]];
 		B2 = [waypoint(2,:);waypoint(3,:);[0,1.4,0];[-3,0,0]];
 		B3 = [waypoint(3,:);waypoint(4,:);[-3,0,0];[0,-1.4,0]];
