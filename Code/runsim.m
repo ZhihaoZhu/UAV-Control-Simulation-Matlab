@@ -1,7 +1,7 @@
 % Simulation times, in seconds. 
 start_time = 0; 
 end_time = 20; 
-dt = 0.01; 
+dt = 0.005; 
 times = start_time:dt:end_time;
 N = numel(times);
 
@@ -33,7 +33,7 @@ ctrl.ct = plant_params.thrust_coefficient;
 ctrl.ms = ctrl.ct*plant_params.moment_scale;
 
 % initialize state X
-init_pos = [0; 0; 1];
+init_pos = [0; 0; 0.5];
 init_vel = zeros(3,1);
 init_rpm = plant_params.rpm_min*ones(4,1);
 
@@ -104,18 +104,18 @@ des_y = des_state.pos(2,:);
 des_z = des_state.pos(3,:);
 
 
-% plot(x);
-% hold on
-% plot(y);
-% hold on
-% plot(z);
-% hold on;
-% plot(des_state.pos(1,:));
-% hold on;
-% plot(des_state.pos(2,:));
-% hold on;
-% plot(des_state.pos(3,:));
-% hold on;
+plot(x);
+hold on
+plot(y);
+hold on
+plot(z);
+hold on;
+plot(des_state.pos(1,:));
+hold on;
+plot(des_state.pos(2,:));
+hold on;
+plot(des_state.pos(3,:));
+hold on;
 
 
 plot(des_state.acc(2,:)); 
