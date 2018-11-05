@@ -106,7 +106,7 @@ for iter = 1:N-1
 %                 disp("tracking")  
 %                 disp(iter)
                 tracking_time = 10;
-                wp_traGenerator(iter, time, tracking_time, tracking_start);
+                4_traGenerator(iter, time, tracking_time, tracking_start);
                 if iter == tracking_start + round(tracking_time/dt, 0)
                     ready_to_land = true;
                     current_state = 2;
