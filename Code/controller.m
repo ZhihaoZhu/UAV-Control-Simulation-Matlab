@@ -1,4 +1,3 @@
-
 %% This function generate the control value for each time iteration
 % input: the error state: E; The desired state: X;
 % output: The force and 3 torques

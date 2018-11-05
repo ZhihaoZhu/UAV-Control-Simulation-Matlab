@@ -1,6 +1,6 @@
 % Simulation times, in seconds. 
 start_time = 0; 
-end_time = 20; 
+end_time = 10; 
 dt = 0.01; 
 times = start_time:dt:end_time;
 N = numel(times);
@@ -77,7 +77,7 @@ ready_to_land = false;
 target_iter_stamp = 0;
 % tracking_start = 0;
 
-%% ************************* RUN SIMULATION *************************
+%% ************************* State Machine SIMULATION *************************
 for iter = 1:N-1
 
     if iter >= target_iter_stamp
@@ -106,7 +106,7 @@ for iter = 1:N-1
 %                 disp("tracking")  
 %                 disp(iter)
                 tracking_time = 10;
-                4_traGenerator(iter, time, tracking_time, tracking_start);
+                traGenerator4(iter, time, tracking_time, tracking_start);
                 if iter == tracking_start + round(tracking_time/dt, 0)
                     ready_to_land = true;
                     current_state = 2;
@@ -121,6 +121,29 @@ for iter = 1:N-1
 %     Generate the trajectory in different situations:
 %     line_traGenerator(iter, time, end_time)
 %     wp_traGenerator(iter, time, end_time, 1);
+
+    % generate the Force and Torque
+    [F_des, M_des] = controller(iter, ctrl, plant_params); % generate force, torque
+    [F_act,M_act] = motor_model(iter, dt, ctrl, plant_params, F_des, M_des);
+    
+    % generate state vector
+    s = state_vector(iter);
+
+    % generate the derivative of state vector "s"
+    sdot = physical_model(iter, F_act, M_act,s,plant_params); 
+
+    % update state
+    update_state(iter,sdot,dt);
+
+    time = time + dt;
+end
+
+%% ************************* Question 10 SIMULATION *************************
+for iter = 1:N-1
+
+%     Generate the trajectory in different situations:
+%     line_traGenerator(iter, time, end_time)
+    wp_traGenerator(iter, dt, end_time);
 
     % generate the Force and Torque
     [F_des, M_des] = controller(iter, ctrl, plant_params); % generate force, torque
@@ -156,9 +179,9 @@ plot(y);
 hold on
 plot(z);
 hold on;
-plot(des_state.pos(1,:));
-hold on;
 plot(des_state.pos(2,:));
+hold on;
+plot(des_state.pos(3,:));
 hold on;
 plot(des_state.vel(2,:));
 hold on;
