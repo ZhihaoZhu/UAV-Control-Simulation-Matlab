@@ -13,13 +13,11 @@ function wp_traGenerator(iter,time,T,T_start)
                 0  0  1];
     numInterval = 4;
 	if iter-T_start == 0
-        disp("zero condition")
-        disp(iter);
         A = [1 0 0 0;  
 			 1 1 1 1;
 			 0 1 0 0;
 			 0 1 2 3;];
-          
+        
 		B1 = [waypoint(1,:);waypoint(2,:);zeros(1,3);[0,1.4,0]];
 		B2 = [waypoint(2,:);waypoint(3,:);[0,1.4,0];[-3,0,0]];
 		B3 = [waypoint(3,:);waypoint(4,:);[-3,0,0];[0,-1.4,0]];
@@ -33,7 +31,7 @@ function wp_traGenerator(iter,time,T,T_start)
 		
         scale = (time-T_start*dt)/(T/numInterval);
 		des_state.pos(:,iter) = alpha1'*[1;scale; scale^2;   scale^3];
-		des_state.vel(:,iter) = alpha1'*[0;    1; 2*scale; 3*scale^2];
+		des_state.vel(:,iter) = alpha1'*[0;    1; 2*scale; 3*scale^2]/(T/numInterval);
 % 		des_state.acc(:,iter) = alpha1'*[0;    0;      2;  6*scale; 12*scale^2; 20*scale^3];
     else
         wptimes = (T_start-1)*dt:T/numInterval:T+(T_start-1)*dt;
@@ -41,7 +39,7 @@ function wp_traGenerator(iter,time,T,T_start)
     	coeff = cell2mat(Alpha(intervel_index));
 		scale = (time-wptimes(intervel_index))/(T/numInterval);
 		des_state.pos(:,iter) = coeff'*[1;scale; scale^2;   scale^3];
-		des_state.vel(:,iter) = coeff'*[0;    1; 2*scale; 3*scale^2];
+		des_state.vel(:,iter) = coeff'*[0;    1; 2*scale; 3*scale^2]/(T/numInterval);
 % 		des_state.acc(:,iter) = coeff'*[0;    0;      2;  6*scale; 12*scale^2; 20*scale^3];
 	end
 end

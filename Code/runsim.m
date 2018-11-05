@@ -117,8 +117,8 @@ for iter = 1:N-1
                 target_iter_stamp = N-1;
         end
     end
-    
-%     generate coefficient for trajectore generator --- alpha;
+
+%     Generate the trajectory in different situations:
 %     line_traGenerator(iter, time, end_time)
 %     wp_traGenerator(iter, time, end_time, 1);
 
@@ -160,7 +160,7 @@ plot(des_state.pos(1,:));
 hold on;
 plot(des_state.pos(2,:));
 hold on;
-plot(des_state.pos(2,:));
+plot(des_state.vel(2,:));
 hold on;
 plot(des_state.acc(1,:));
 hold on;
