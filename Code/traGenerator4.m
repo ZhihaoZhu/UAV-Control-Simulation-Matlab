@@ -32,7 +32,6 @@ function traGenerator4(iter,time,T,T_start)
         scale = (time-T_start*dt)/(T/numInterval);
 		des_state.pos(:,iter) = alpha1'*[1;scale; scale^2;   scale^3];
 		des_state.vel(:,iter) = alpha1'*[0;    1; 2*scale; 3*scale^2]/(T/numInterval);
-% 		des_state.acc(:,iter) = alpha1'*[0;    0;      2;  6*scale; 12*scale^2; 20*scale^3];
     else
         wptimes = (T_start-1)*dt:T/numInterval:T+(T_start-1)*dt;
     	intervel_index = find(wptimes >= time,1)-1;
@@ -40,6 +39,5 @@ function traGenerator4(iter,time,T,T_start)
 		scale = (time-wptimes(intervel_index))/(T/numInterval);
 		des_state.pos(:,iter) = coeff'*[1;scale; scale^2;   scale^3];
 		des_state.vel(:,iter) = coeff'*[0;    1; 2*scale; 3*scale^2]/(T/numInterval);
-% 		des_state.acc(:,iter) = coeff'*[0;    0;      2;  6*scale; 12*scale^2; 20*scale^3];
 	end
 end

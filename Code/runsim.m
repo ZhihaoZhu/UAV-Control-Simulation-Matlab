@@ -1,6 +1,6 @@
 % Simulation times, in seconds. 
 start_time = 0; 
-end_time = 10; 
+end_time = 20; 
 dt = 0.01; 
 times = start_time:dt:end_time;
 N = numel(times);
@@ -77,8 +77,8 @@ ready_to_land = false;
 target_iter_stamp = 0;
 % tracking_start = 0;
 
-%% ************************* State Machine SIMULATION *************************
-for iter = 1:N-1
+%% ************************* State Machine SIMULATION Q4 & Q10 *************************
+for iter = 1:N-2
 
     if iter >= target_iter_stamp
         switch current_state
@@ -106,7 +106,7 @@ for iter = 1:N-1
 %                 disp("tracking")  
 %                 disp(iter)
                 tracking_time = 10;
-                traGenerator4(iter, time, tracking_time, tracking_start);
+                traGenerator10(iter, time, tracking_time, tracking_start);
                 if iter == tracking_start + round(tracking_time/dt, 0)
                     ready_to_land = true;
                     current_state = 2;
@@ -114,7 +114,7 @@ for iter = 1:N-1
                                    
             case 4 % Land
                 land(iter); 
-                target_iter_stamp = N-1;
+                target_iter_stamp = N;
         end
     end
 
@@ -139,11 +139,11 @@ for iter = 1:N-1
 end
 
 %% ************************* Question 10 SIMULATION *************************
-for iter = 1:N-1
+for iter = 1:N-2
 
 %     Generate the trajectory in different situations:
 %     line_traGenerator(iter, time, end_time)
-    wp_traGenerator(iter, dt, end_time);
+    traGenerator8(iter, time, end_time);
 
     % generate the Force and Torque
     [F_des, M_des] = controller(iter, ctrl, plant_params); % generate force, torque
@@ -161,6 +161,30 @@ for iter = 1:N-1
     time = time + dt;
 end
 
+%% ************************ Generate Animation *********************
+disp('Initializing figures...');
+h_fig = figure;
+h_3d = gca;
+axis equal
+grid on
+view(3);
+xlabel('x [m]'); ylabel('y [m]'); zlabel('z [m]')
+quadcolors = lines(1);
+set(gcf,'Renderer','OpenGL')
+
+time = 0;
+% initialize
+max_iter = N-1;
+for iter = 1:N-1
+    if iter == 1
+        s_plot = state2Plot(iter);
+        QP = QuadPlot(1, s_plot, plant_params.arm_length, 0.05,quadcolors(1,:), N-1, h_3d);
+        QP.UpdateQuadPlot(s_plot, [des_state.pos(:,iter); des_state.vel(:,iter)], time);
+    end 
+    s_plot = state2Plot(iter);
+    QP.UpdateQuadPlot(s_plot, [des_state.pos(:,iter); des_state.vel(:,iter)], time);
+end
+
 %% ************************ plot the trajectory *********************
 disp('Initializing figures...');
 
@@ -168,37 +192,54 @@ x = state.pos(1,:);
 y = state.pos(2,:);
 z = state.pos(3,:);
 
-des_x = des_state.pos(1,:);
-des_y = des_state.pos(2,:);
-des_z = des_state.pos(3,:);
-
-
+figure(1)
+subplot(1,3,1);
 plot(x);
 hold on
+subplot(1,3,2);
 plot(y);
 hold on
+subplot(1,3,3);
 plot(z);
-hold on;
+hold on
+
+
+figure(2)
+subplot(1,3,1);
+plot(des_state.pos(1,:));
+hold on
+subplot(1,3,2);
 plot(des_state.pos(2,:));
-hold on;
+hold on
+subplot(1,3,3);
 plot(des_state.pos(3,:));
-hold on;
+hold on
+
+figure(3)
+subplot(1,3,1);
+plot(des_state.vel(1,:));
+hold on
+subplot(1,3,2);
 plot(des_state.vel(2,:));
-hold on;
-plot(des_state.acc(1,:));
-hold on;
-  
-% plot3(x,y,z)
-% hold on
-% plot3(des_x,des_y,des_z)
-% view([30,30,45])
-% axis equal;
+hold on
+subplot(1,3,3);
+plot(des_state.vel(3,:));
+hold on
 
-grid on;
-grid minor;
+figure(4)
+subplot(1,3,1);
+plot(x-des_state.pos(1,:));
+hold on
+subplot(1,3,2);
+plot(y-des_state.pos(2,:));
+hold on
+subplot(1,3,3);
+plot(z-des_state.pos(3,:));
+hold on
 
-run_sim = true;
-ready_to_land = false;
+
+
+
 
     
 

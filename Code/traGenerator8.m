@@ -2,14 +2,14 @@
 % Input wpvec; wptimes; alpha;
 % Output: None, but updated alpha;
 
-function wp_tra_test(iter,time,T)
+function traGenerator8(iter,time,T)
     global des_state;
     persistent Alpha
-    waypoint = [0  0  0.5 0;
-                2  1  0.5 0.5*pi;
-                0  2  0.5 1*pi;
-                -2 1  0.5 1.5*pi;
-                0  0  0.5 2*pi];
+    waypoint = [0  0  1 0;
+                2  1  1 0;
+                0  2  1 0;
+                -2 1  1 0;
+                0  0  1 0];
 
     numInterval = 4;
     if iter == 1
@@ -20,10 +20,24 @@ function wp_tra_test(iter,time,T)
              0 0 2 0 0  0;
              0 0 2 6 12 20];
 
-        B1 = [waypoint(1,:);waypoint(2,:);zeros(1,4);[0,2,0,0];zeros(1,4);[-8.8,0,0,0]];
-        B2 = [waypoint(2,:);waypoint(3,:);[0,2,0,0];[-2.8,0,0,0];[-8.8,0,0,0];[0,-2.5,0,0]];
-        B3 = [waypoint(3,:);waypoint(4,:);[-2.8,0,0,0];[0,-2,0,0];[0,-2.5,0,0];[8.8,0,0,0]];
-        B4 = [waypoint(4,:);waypoint(5,:);[0,-2,0,0];zeros(1,4);[8.8,0,0,0];zeros(1,4)];
+%         B1 = [waypoint(1,:);waypoint(2,:);zeros(1,4);[0,2,0,0];zeros(1,4);[-8.8,0,0,0]];
+%         B2 = [waypoint(2,:);waypoint(3,:);[0,2,0,0];[-2.8,0,0,0];[-8.8,0,0,0];[0,-2.5,0,0]];
+%         B3 = [waypoint(3,:);waypoint(4,:);[-2.8,0,0,0];[0,-2,0,0];[0,-2.5,0,0];[8.8,0,0,0]];
+%         B4 = [waypoint(4,:);waypoint(5,:);[0,-2,0,0];zeros(1,4);[8.8,0,0,0];zeros(1,4)];
+     
+%       For trajectory 1
+
+        B1 = [waypoint(1,:);waypoint(2,:);[0,0,0,0];[2,0,0,0];zeros(1,4);[-8.8,0,0,0]];
+        B2 = [waypoint(2,:);waypoint(3,:);[2,0,0,0];[0,-2.8,0,0];[-8.8,0,0,0];[0,-2.5,0,0]];
+        B3 = [waypoint(3,:);waypoint(4,:);[0,-2.8,0,0];[-2,0,0,0];[0,-2.5,0,0];[8.8,0,0,0]];
+        B4 = [waypoint(4,:);waypoint(5,:);[-2,0,0,0];[0,2,0,0];[8.8,0,0,0];zeros(1,4)];
+
+%       For trajectory 2
+
+%         B1 = [waypoint(1,:);waypoint(2,:);[0,1,0,0];[0,1,0,0];zeros(1,4);[-8.8,0,0,0]];
+%         B2 = [waypoint(2,:);waypoint(3,:);[0,1,0,0];[-2.8,0,0,0];[-8.8,0,0,0];[0,-2.5,0,0]];
+%         B3 = [waypoint(3,:);waypoint(4,:);[-2.8,0,0,0];[0,-2,0,0];[0,-2.5,0,0];[8.8,0,0,0]];
+%         B4 = [waypoint(4,:);waypoint(5,:);[0,-2,0,0];[0,1,0,0];[8.8,0,0,0];zeros(1,4)];
 
         alpha1 = A \ B1;
         alpha2 = A \ B2;
