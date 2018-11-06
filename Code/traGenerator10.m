@@ -10,7 +10,7 @@ function traGenerator10(iter,time,T,T_start)
 				2  1  0.5;
 				0  2  0.5;
 				-2 1  0.5;
-                0  0  0.5];
+                0  0  0.4];
     numInterval = 4;
 	if iter-T_start == 0
         A = [1 0 0 0;  
@@ -21,7 +21,7 @@ function traGenerator10(iter,time,T,T_start)
 		B1 = [waypoint(1,:);waypoint(2,:);zeros(1,3);[0,1.4,0]];
 		B2 = [waypoint(2,:);waypoint(3,:);[0,1.4,0];[-3,0,0]];
 		B3 = [waypoint(3,:);waypoint(4,:);[-3,0,0];[0,-1.4,0]];
-        B4 = [waypoint(4,:);waypoint(5,:);[0,-1.4,0];zeros(1,3)];
+        B4 = [waypoint(4,:);waypoint(5,:);[0,-1.4,0];[0,0,0]];
         
 		alpha1 = A \ B1;
 		alpha2 = A \ B2;

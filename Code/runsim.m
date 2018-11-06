@@ -31,7 +31,7 @@ ctrl.ct = plant_params.thrust_coefficient;
 ctrl.ms = ctrl.ct*plant_params.moment_scale;
 
 % initialize state X
-init_pos = [0; 0; 0.5];
+init_pos = [0; 0; 0];
 init_vel = zeros(3,1);
 init_rpm = plant_params.rpm_min*ones(4,1);
 
@@ -228,6 +228,7 @@ for iter = 1:N-2
     time = time + dt;
 end
 
+
 %% ************************ Generate Animation *********************
 disp('Initializing figures...');
 h_fig = figure;
@@ -292,17 +293,17 @@ hold on
 subplot(1,3,3);
 plot(des_state.vel(3,:));
 hold on
-% 
-% figure(4)
-% subplot(1,3,1);
-% plot(x-des_state.pos(1,:));
-% hold on
-% subplot(1,3,2);
-% plot(y-des_state.pos(2,:));
-% hold on
-% subplot(1,3,3);
-% plot(z-des_state.pos(3,:));
-% hold on
+
+figure(4)
+subplot(1,3,1);
+plot(x-des_state.pos(1,:));
+hold on
+subplot(1,3,2);
+plot(y-des_state.pos(2,:));
+hold on
+subplot(1,3,3);
+plot(z-des_state.pos(3,:));
+hold on
 
 
 

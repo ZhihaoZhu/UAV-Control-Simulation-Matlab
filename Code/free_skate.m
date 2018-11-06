@@ -1,17 +1,17 @@
-% This function generate the trajectory for two point tracking
+% This function generate hovering trajectory common 
 
-function l(iter,time,T)
+function free_skate(iter,time,T)
 	global des_state;
 	persistent Alpha
     v1 = 10;
-    v2 = 14;
-    a1 = 8.8;
-    a2 = 2.5;
-	waypoint = [0  0  1 0;
-				2  1  1 0;
-				0  2  1 0;
-				-2 1  1 0;
-                0  0  1 0];
+    v2 = 10;
+    a1 = 0;
+    a2 = 0;
+	waypoint = [0  0 1 0;
+				0  0 1 pi/2;
+				0  0 1 pi;
+				0  0 1 3*pi/2;
+                0  0 1 2*pi];
 	numInterval = 4;
 	if iter == 1
 		% minimize the accerlation
