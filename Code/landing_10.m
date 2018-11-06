@@ -1,44 +1,32 @@
-% This function generate the trajectory for two point tracking
+% This function compute the coeffcient alpha for trajectory generator
+% Input wpvec; wptimes; alpha;
+% Output: None, but updated alpha;
 
-function line_traGenerator(iter,time,T)
+function landing_10(iter,time,T,T_start)
 	global des_state;
-	persistent Alpha
-	waypoint = [0 0 1;
-				0 0 0];
-	numInterval = 1;
-	if iter == 1
-		% minimize the accerlation
-		A = [1 0 0 0  0  0   0   0;
-			 1 1 1 1  1  1   1   1;
-			 0 1 0 0  0  0   0   0;
-			 0 1 2 3  4  5   6   7;
-             0 0 2 0  0  0   0   0;
-             0 0 2 6 12 20  30  42;
-             0 0 0 6  0  0   0   0;
-             0 0 0 6 24 60 120 210];
-
-		B1 = [waypoint(1,:);waypoint(2,:);zeros(1,3);zeros(1,3);zeros(1,3);zeros(1,3);zeros(1,3);zeros(1,3)];
-		alpha1 = A \ B1;
-        Alpha = {alpha1};
+    dt = 0.01;
+	persistent alpha1
+    waypoint = [0  0  0.5;
+                0  0  0];
+    numInterval = 1;
+	if iter-T_start == 0
+        A = [1 0 0 0;  
+			 1 1 1 1;
+			 0 1 0 0;
+			 0 1 2 3;];
         
-        scale = time/(T/numInterval);
-        pos = alpha1'*[1;scale;scale^2;   scale^3;   scale^4;    scale^5; scale^6;       scale^7];
-        vel = alpha1'*[0;    1;2*scale; 3*scale^2; 4*scale^3;  5*scale^4; 6*scale^5;   7*scale^6]/(T/2);
-        acc = alpha1'*[0;    0;      2;  6*scale; 12*scale^2; 20*scale^3; 30*scale^4; 42*scale^5]/(T/2)^2;
-		des_state.pos(:,iter) = pos;
-		des_state.vel(:,iter) = vel;
-		des_state.acc(:,iter) = acc;
+		B1 = [waypoint(1,:);waypoint(2,:);zeros(1,3);[0,0,0]];
+
+       
+		alpha1 = A \ B1;
+
+        scale = (time-T_start*dt)/(T/numInterval);
+		des_state.pos(:,iter) = alpha1'*[1;scale; scale^2;   scale^3];
+		des_state.vel(:,iter) = alpha1'*[0;    1; 2*scale; 3*scale^2]/(T/numInterval);
     else
         
-% 		wptimes = 0:T/numInterval:T+0.00001;
-%     	intervel_index = find(wptimes >= round(time,4),1)-1;
-    	coeff = cell2mat(Alpha(1));
-		scale = (time)/(T/numInterval);
-		pos = coeff'*[1;scale;scale^2;   scale^3;   scale^4;    scale^5; scale^6;       scale^7];
-        vel = coeff'*[0;    1;2*scale; 3*scale^2; 4*scale^3;  5*scale^4; 6*scale^5;   7*scale^6]/(T/2);
-        acc = coeff'*[0;    0;      2;  6*scale; 12*scale^2; 20*scale^3; 30*scale^4; 42*scale^5]/(T/2)^2;
-        des_state.pos(:,iter) = pos;
-		des_state.vel(:,iter) = vel;
-		des_state.acc(:,iter) = acc;
+		scale = (time-T_start*dt)/(T/numInterval);
+		des_state.pos(:,iter) = alpha1'*[1;scale; scale^2;   scale^3];
+		des_state.vel(:,iter) = alpha1'*[0;    1; 2*scale; 3*scale^2]/(T/numInterval);
 	end
 end

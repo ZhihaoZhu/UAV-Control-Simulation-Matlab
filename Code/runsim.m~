@@ -1,6 +1,6 @@
 % Simulation times, in seconds. 
 start_time = 0; 
-end_time = 5; 
+end_time = 20; 
 dt = 0.01; 
 times = start_time:dt:end_time;
 N = numel(times);
@@ -31,7 +31,7 @@ ctrl.ct = plant_params.thrust_coefficient;
 ctrl.ms = ctrl.ct*plant_params.moment_scale;
 
 % initialize state X
-init_pos = [0; 0; 1];
+init_pos = [0; 0; 0];
 init_vel = zeros(3,1);
 init_rpm = plant_params.rpm_min*ones(4,1);
 
@@ -159,6 +159,7 @@ for iter = 1:N-2
 
                 if ready_to_land
                     current_state = 4;
+                    landing_start = iter*0.01;
                 else
                     current_state = 3;
                 end
@@ -174,9 +175,8 @@ for iter = 1:N-2
                 end
                                    
             case 4 % Land
-                landing
-                line_traGenerator(iter,time,T);
-                target_iter_stamp = N;
+                landing_time = 20-landing_start;
+                line_traGenerator(iter,time,landing_time, landing_start);
         end
     end
 
@@ -199,7 +199,7 @@ for iter = 1:N-2
 
     time = time + dt;
 end
-%% ************************* Question 10 SIMULATION *************************
+%% ************************* Question  SIMULATION *************************
 for iter = 1:N-2
 
 %     Generate the trajectory in different situations:

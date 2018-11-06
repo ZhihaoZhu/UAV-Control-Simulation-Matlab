@@ -1,6 +1,6 @@
 % Simulation times, in seconds. 
 start_time = 0; 
-end_time = 5; 
+end_time = 20; 
 dt = 0.01; 
 times = start_time:dt:end_time;
 N = numel(times);
@@ -31,7 +31,7 @@ ctrl.ct = plant_params.thrust_coefficient;
 ctrl.ms = ctrl.ct*plant_params.moment_scale;
 
 % initialize state X
-init_pos = [0; 0; 1];
+init_pos = [0; 0; 0.5];
 init_vel = zeros(3,1);
 init_rpm = plant_params.rpm_min*ones(4,1);
 
@@ -106,7 +106,7 @@ for iter = 1:N-2
 %                 disp("tracking")  
 %                 disp(iter)
                 tracking_time = 10;
-                traGenerator4(iter, time, tracking_time, tracking_start);
+                traGenerator10(iter, time, tracking_time, tracking_start);
                 if iter == tracking_start + round(tracking_time/dt, 0)
                     ready_to_land = true;
                     current_state = 2;
@@ -159,6 +159,8 @@ for iter = 1:N-2
 
                 if ready_to_land
                     current_state = 4;
+                    landing_start = iter*0.01+3;
+                    disp(landing_start)
                 else
                     current_state = 3;
                 end
@@ -174,9 +176,11 @@ for iter = 1:N-2
                 end
                                    
             case 4 % Land
-                landing
-                line_traGenerator(iter,time,T);
-                target_iter_stamp = N;
+%                 disp(iter)
+                landing_time = 20-landing_start;
+                landing_10(iter,time,landing_time, round(landing_start/0.01,0));
+%                 land(iter); 
+%                 target_iter_stamp = N;
         end
     end
 
@@ -199,13 +203,14 @@ for iter = 1:N-2
 
     time = time + dt;
 end
-%% ************************* Question 10 SIMULATION *************************
+%% ************************* Question  SIMULATION *************************
 for iter = 1:N-2
 
 %     Generate the trajectory in different situations:
 %     line_traGenerator(iter, time, end_time)
 %     traGenerator9(iter, time, end_time);
-    line_traGenerator(iter,time,end_time)
+%     line_traGenerator(iter,time,end_time);
+    landing_10(iter,time,end_time,1);
     
     % generate the Force and Torque
     [F_des, M_des] = controller(iter, ctrl, plant_params); % generate force, torque
