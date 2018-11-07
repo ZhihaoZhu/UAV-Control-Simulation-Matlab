@@ -6,7 +6,7 @@ function landing_10(iter,time,T,T_start)
 	global des_state;
     dt = 0.01;
 	persistent alpha1
-    waypoint = [0  0  0.5;
+    waypoint = [0  0  1;
                 0  0  0];
     numInterval = 1;
 	if iter-T_start == 0

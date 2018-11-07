@@ -6,11 +6,11 @@ function traGenerator4(iter,time,T,T_start)
 	global des_state;
     dt = 0.01;
 	persistent Alpha
-    waypoint = [0  0  0.5;
-				2  1  0.5;
-				0  2  0.5;
-				-2 1  0.5;
-                0  0  0.5];
+    waypoint = [0  0  1;
+				2  1  1;
+				0  2  1;
+				-2 1  1;
+                0  0  1];
     numInterval = 4;
 	if iter-T_start == 0
         A = [1 0 0 0;  

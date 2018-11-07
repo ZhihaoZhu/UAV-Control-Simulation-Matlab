@@ -1,6 +1,9 @@
+clear;
+clc;
+
 % Simulation times, in seconds. 
 start_time = 0; 
-end_time = 0.6; 
+end_time = 20; 
 dt = 0.01; 
 times = start_time:dt:end_time;
 N = numel(times);
@@ -31,7 +34,7 @@ ctrl.ct = plant_params.thrust_coefficient;
 ctrl.ms = ctrl.ct*plant_params.moment_scale;
 
 % initialize state X
-init_pos = [0; 0; 1];
+init_pos = [0; 0; 0];
 init_vel = zeros(3,1);
 init_rpm = plant_params.rpm_min*ones(4,1);
 
@@ -59,42 +62,55 @@ state.pos(:,1) = init_pos;
 state.vel(:,1) = init_vel;
 state.wSpeed(:,1) = init_rpm;
 
-time = 0; % initial time
+time = 0; 
 
-% initial function
-controlhandle = @controller;
-trajhandle = @traj_generator;
-
-% State Machine Initialization
-% 0: Idle
-% 1: Take-off
-% 2: Hover
-% 3: Tracking
-% 4: Land
 
 current_state = 1;
 ready_to_land = false;
 target_iter_stamp = 0;
-% tracking_start = 0;
 
-%% ************************* Question 11 SIMULATION *************************
+
+%% tra_following simulation
+
 for iter = 1:N-2
 
+    if iter >= target_iter_stamp
+        switch current_state
+            case 1 % Take-off
+                takeoff(1, iter);
+                if arrived(state.pos(:, iter), des_state.pos(:, iter), 0.01) == true
+                    current_state = 2;
+                end
 
-    free_skate(iter,time,end_time);
-    
-    % generate the Force and Torque
-    [F_des, M_des] = controller(iter, ctrl, plant_params); % generate force, torque
-    [F_act,M_act] = motor_model(iter, dt, ctrl, plant_params, F_des, M_des);
-    
-    % generate state vector
-    s = state_vector(iter);
+            case 2 % Hover
+                hover_time = 3;
+                num_iter = round(hover_time/dt, 0);
+                hover(num_iter, iter);
+                target_iter_stamp = iter + num_iter;    
+                tracking_start = target_iter_stamp;
 
-    % generate the derivative of state vector "s"
-    sdot = physical_model(iter, F_act, M_act,s,plant_params); 
+                if ready_to_land
+                    current_state = 4;
+                else
+                    current_state = 3;
+                end
 
-    % update state
-    update_state(iter,sdot,dt);
+            case 3 % Tracking
+                tracking_time = 10;
+                traGenerator5(iter, time, tracking_time, tracking_start);
+                if iter == tracking_start + round(tracking_time/dt, 0)
+                    ready_to_land = true;
+                    current_state = 2;
+                end
+                                   
+            case 4 % Land
+                land(iter); 
+                target_iter_stamp = N;
+        end
+    end
+
+    % using the desired trajectory to update the state
+    update_state(iter,ctrl,plant_params, dt);
 
     time = time + dt;
 end
@@ -128,7 +144,7 @@ hold on
 subplot(1,3,3);
 plot(des_state.pos(3,:));
 hold on
-
+% 
 % figure(3)
 % subplot(1,3,1);
 % plot(des_state.vel(1,:));
@@ -142,23 +158,17 @@ hold on
 
 figure(4)
 subplot(1,3,1);
-plot(state.omega(1,:));
+plot(x-des_state.pos(1,:));
 hold on
 subplot(1,3,2);
-plot(state.omega(2,:));
+plot(y-des_state.pos(2,:));
 hold on
 subplot(1,3,3);
-plot(state.omega(3,:));
+plot(z-des_state.pos(3,:));
 hold on
 
-% figure(5)
-% subplot(1,3,1);
-% plot(x-des_state.pos(1,:));
-% hold on
-% subplot(1,3,2);
-% plot(y-des_state.pos(2,:));
-% hold on
-% subplot(1,3,3);
-% plot(z-des_state.pos(3,:));
-% hold on
+figure(5)
+plot(state.rot(3,:));
+hold on
+
 

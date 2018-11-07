@@ -1,6 +1,9 @@
+clear;
+clc;
+
 % Simulation times, in seconds. 
 start_time = 0; 
-end_time = 0.6; 
+end_time = 20; 
 dt = 0.01; 
 times = start_time:dt:end_time;
 N = numel(times);
@@ -31,7 +34,7 @@ ctrl.ct = plant_params.thrust_coefficient;
 ctrl.ms = ctrl.ct*plant_params.moment_scale;
 
 % initialize state X
-init_pos = [0; 0; 1];
+init_pos = [0; 0; 0];
 init_vel = zeros(3,1);
 init_rpm = plant_params.rpm_min*ones(4,1);
 
@@ -61,43 +64,16 @@ state.wSpeed(:,1) = init_rpm;
 
 time = 0; % initial time
 
-% initial function
-controlhandle = @controller;
-trajhandle = @traj_generator;
 
-% State Machine Initialization
-% 0: Idle
-% 1: Take-off
-% 2: Hover
-% 3: Tracking
-% 4: Land
+%% tra_following simulation
 
-current_state = 1;
-ready_to_land = false;
-target_iter_stamp = 0;
-% tracking_start = 0;
-
-%% ************************* Question 11 SIMULATION *************************
 for iter = 1:N-2
-
-
-    free_skate(iter,time,end_time);
-    
-    % generate the Force and Torque
-    [F_des, M_des] = controller(iter, ctrl, plant_params); % generate force, torque
-    [F_act,M_act] = motor_model(iter, dt, ctrl, plant_params, F_des, M_des);
-    
-    % generate state vector
-    s = state_vector(iter);
-
-    % generate the derivative of state vector "s"
-    sdot = physical_model(iter, F_act, M_act,s,plant_params); 
-
-    % update state
-    update_state(iter,sdot,dt);
+    line_traGenerator(iter,time,end_time);
+    update_state(iter,ctrl,plant_params, dt);
 
     time = time + dt;
 end
+
 
 %% ************************ plot the trajectory *********************
 disp('Initializing figures...');
@@ -128,7 +104,7 @@ hold on
 subplot(1,3,3);
 plot(des_state.pos(3,:));
 hold on
-
+% 
 % figure(3)
 % subplot(1,3,1);
 % plot(des_state.vel(1,:));
@@ -142,23 +118,13 @@ hold on
 
 figure(4)
 subplot(1,3,1);
-plot(state.omega(1,:));
+plot(x-des_state.pos(1,:));
 hold on
 subplot(1,3,2);
-plot(state.omega(2,:));
+plot(y-des_state.pos(2,:));
 hold on
 subplot(1,3,3);
-plot(state.omega(3,:));
+plot(z-des_state.pos(3,:));
 hold on
 
-% figure(5)
-% subplot(1,3,1);
-% plot(x-des_state.pos(1,:));
-% hold on
-% subplot(1,3,2);
-% plot(y-des_state.pos(2,:));
-% hold on
-% subplot(1,3,3);
-% plot(z-des_state.pos(3,:));
-% hold on
 

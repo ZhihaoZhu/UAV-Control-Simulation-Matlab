@@ -3,14 +3,14 @@
 function free_skate(iter,time,T)
 	global des_state;
 	persistent Alpha
-    v1 = 10;
-    v2 = 10;
+    v1 = 1;
+    v2 = 1;
     a1 = 0;
     a2 = 0;
 	waypoint = [0  0 1 0;
-				0  0 1 pi/2;
-				0  0 1 pi;
-				0  0 1 3*pi/2;
+				1  1 1 pi/2;
+				0  2 1 pi;
+				-1 1 1 3*pi/2;
                 0  0 1 2*pi];
 	numInterval = 4;
 	if iter == 1
