@@ -24,6 +24,8 @@ function update_state(iter,ctrl,plant_params, dt)
 	
 	desire_rotation = [des_R(1),des_R(2),des_state.yaw(iter)]';
  	des_angVelocity = [des_R_dot(1),des_R_dot(2),des_state.yawdot(iter)]';
+    des_state.rot(:,iter) = desire_rotation;
+    des_state.omega(:,iter) = des_angVelocity;
 	M_des = plant_params.inertia*(ctrl.Kr.*(desire_rotation-state.rot(:,iter))... 
 			+ ctrl.Kw.*(des_angVelocity - state.omega(:,iter)));
         
@@ -52,6 +54,7 @@ function update_state(iter,ctrl,plant_params, dt)
     phi = s(7);
 	theta = s(8);
 	yaw = s(9);
+    state.yaw(iter) = yaw; 
 	p = s(10);
 	q = s(11);
 	r = s(12);
