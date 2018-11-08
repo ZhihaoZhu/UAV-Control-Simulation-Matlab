@@ -1,5 +1,6 @@
 clear;
 clc;
+close all;
 
 % Simulation times, in seconds. 
 start_time = 0; 
@@ -30,7 +31,7 @@ ctrl.Kr = [190 198 80]';
 ctrl.Kw = [30 30 17.88]';
 
 ctrl.inertia = plant_params.inertia;
-ctrl.ct = plant_params.thrust_coefficient;
+ctrl.ct = 2*plant_params.thrust_coefficient;
 ctrl.ms = ctrl.ct*plant_params.moment_scale;
 
 % initialize state X
@@ -47,6 +48,7 @@ state.vel = zeros(3,N-1);
 state.rot = zeros(3,N-1);
 state.omega = zeros(3,N-1);
 state.wSpeed = zeros(4,N-1);
+state.yaw = zeros(N-1,1);
 
 % desire state structure:
 global des_state;
@@ -54,6 +56,8 @@ des_state = struct();
 des_state.pos = zeros(3,N-1);
 des_state.vel = zeros(3,N-1);
 des_state.acc = zeros(3,N-1);
+des_state.rot = zeros(3,N-1);
+des_state.omega = zeros(3,N-1);
 des_state.yaw = zeros(N-1,1);
 des_state.yawdot = zeros(N-1,1);
 
@@ -63,7 +67,6 @@ state.vel(:,1) = init_vel;
 state.wSpeed(:,1) = init_rpm;
 
 time = 0; 
-
 
 current_state = 1;
 ready_to_land = false;
@@ -93,14 +96,17 @@ for iter = 1:N-2
                     current_state = 4;
                 else
                     current_state = 3;
+                    start_point = iter+round(3/dt);
+                 
                 end
 
             case 3 % Tracking
-                tracking_time = 6;
+                tracking_time = 2.3;
                 traGenerator7(iter, time, tracking_time, tracking_start);
                 if iter == tracking_start + round(tracking_time/dt, 0)
                     ready_to_land = true;
                     current_state = 2;
+                    end_point = iter;
                 end
                                    
             case 4 % Land
@@ -115,7 +121,8 @@ for iter = 1:N-2
     time = time + dt;
 end
 
-%% ************************ plot the trajectory *********************
+
+%%
 disp('Initializing figures...');
 
 x = state.pos(1,:);
@@ -124,51 +131,133 @@ z = state.pos(3,:);
 
 figure(1)
 subplot(1,3,1);
-plot(x);
+plot(x(start_point:end_point),'linewidth',1);
+ylim([-1 1])
 hold on
+plot(des_state.pos(1,start_point:end_point),'linewidth',1);
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m)','FontSize',10);
+legend('Actual X Position','Desire X Position');
+hold on
+title("x")
 subplot(1,3,2);
-plot(y);
+plot(y(start_point:end_point), 'linewidth',1);
+ylim([-1 1])
+
 hold on
+plot(des_state.pos(2,start_point:end_point),'linewidth',1);
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m)','FontSize',10);
+legend('Actual Y Position','Desire Y Position');
+hold on
+title("y")
 subplot(1,3,3);
-plot(z);
+plot(z(start_point:end_point), 'linewidth',1);
 hold on
+plot(des_state.pos(3,start_point:end_point),'linewidth',1);
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m)','FontSize',10);
+legend('Actual Z Position','Desire Z Position');
+hold on
+title("z")
 
 
-figure(2)
+figure('Name', "error_pos")
 subplot(1,3,1);
-plot(des_state.pos(1,:));
+plot(des_state.pos(1,start_point:end_point)-state.pos(1,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m)','FontSize',10);
 hold on
+title("error_x")
 subplot(1,3,2);
-plot(des_state.pos(2,:));
+plot(des_state.pos(2,start_point:end_point)-state.pos(2,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m)','FontSize',10);
 hold on
+title("error_y")
 subplot(1,3,3);
-plot(des_state.pos(3,:));
+plot(des_state.pos(3,start_point:end_point)-state.pos(3,start_point:end_point),'linewidth',1);
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m)','FontSize',10);
 hold on
-% 
-% figure(3)
-% subplot(1,3,1);
-% plot(des_state.vel(1,:));
-% hold on
-% subplot(1,3,2);
-% plot(des_state.vel(2,:));
-% hold on
-% subplot(1,3,3);
-% plot(des_state.vel(3,:));
-% hold on
+title("error_z")
 
-figure(4)
+
+figure('Name', "error_vel")
 subplot(1,3,1);
-plot(x-des_state.pos(1,:));
+plot(des_state.vel(1,start_point:end_point)-state.vel(1,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m/s)','FontSize',10);
 hold on
+title("error xvel")
 subplot(1,3,2);
-plot(y-des_state.pos(2,:));
+plot(des_state.vel(2,start_point:end_point)-state.vel(2,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m/s)','FontSize',10);
 hold on
+title("error yvel")
 subplot(1,3,3);
-plot(z-des_state.pos(3,:));
+plot(des_state.vel(3,start_point:end_point)-state.vel(3,start_point:end_point),'linewidth',1);
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m/s)','FontSize',10);
 hold on
+title("error zvel")
 
-figure(5)
-plot(des_state.acc(3,:));
+
+figure('Name', "error_rot")
+subplot(1,3,1);
+plot(des_state.rot(1,start_point:end_point)-state.rot(1,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad)','FontSize',10);
 hold on
+title("error phi")
+subplot(1,3,2);
+plot(des_state.rot(2,start_point:end_point)-state.rot(2,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad)','FontSize',10);
+hold on
+title("error theta")
+subplot(1,3,3);
+plot(des_state.rot(3,start_point:end_point)-state.rot(3,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad)','FontSize',10);
+hold on
+title("error yaw")
 
+figure('Name', "error_omega")
+subplot(1,3,1);
+plot(des_state.omega(1,start_point:end_point)-state.omega(1,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad/s)','FontSize',10);
+hold on
+title("error phi vel")
+subplot(1,3,2);
+plot(des_state.omega(2,start_point:end_point)-state.omega(2,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad/s)','FontSize',10);
+hold on
+title("error theta vel")
+subplot(1,3,3);
+plot(des_state.omega(3,start_point:end_point)-state.omega(3,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad/s)','FontSize',10);
+hold on
+title("error yaw vel")
+
+figure(10)
+plot(des_state.acc(3,start_point:end_point));
+title("Acceleration")
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(m/s/s)','FontSize',10);
+hold on
 

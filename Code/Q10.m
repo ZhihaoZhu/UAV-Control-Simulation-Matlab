@@ -1,5 +1,6 @@
 clear;
 clc;
+close all;
 
 % Simulation times, in seconds. 
 start_time = 0; 
@@ -30,11 +31,11 @@ ctrl.Kr = [190 198 80]';
 ctrl.Kw = [30 30 17.88]';
 
 ctrl.inertia = plant_params.inertia;
-ctrl.ct = plant_params.thrust_coefficient;
+ctrl.ct = 2*plant_params.thrust_coefficient;
 ctrl.ms = ctrl.ct*plant_params.moment_scale;
 
 % initialize state X
-init_pos = [0; 0; 0];
+init_pos = [0; 0; 1];
 init_vel = zeros(3,1);
 init_rpm = plant_params.rpm_min*ones(4,1);
 
@@ -47,6 +48,7 @@ state.vel = zeros(3,N-1);
 state.rot = zeros(3,N-1);
 state.omega = zeros(3,N-1);
 state.wSpeed = zeros(4,N-1);
+state.yaw = zeros(N-1,1);
 
 % desire state structure:
 global des_state;
@@ -54,6 +56,8 @@ des_state = struct();
 des_state.pos = zeros(3,N-1);
 des_state.vel = zeros(3,N-1);
 des_state.acc = zeros(3,N-1);
+des_state.rot = zeros(3,N-1);
+des_state.omega = zeros(3,N-1);
 des_state.yaw = zeros(N-1,1);
 des_state.yawdot = zeros(N-1,1);
 
@@ -64,11 +68,9 @@ state.wSpeed(:,1) = init_rpm;
 
 time = 0; 
 
-
 current_state = 1;
 ready_to_land = false;
 target_iter_stamp = 0;
-
 
 %% tra_following simulation
 
@@ -115,7 +117,7 @@ for iter = 1:N-2
         end
     end
 
-
+% 
 %     x2 = 1350;
 %     x3 = 1500;
 %     if iter>x2 && iter<x3
@@ -131,7 +133,7 @@ for iter = 1:N-2
 %         ctrl.Kr = [190 198 80]';
 %         ctrl.Kw = [30 30 17.88]';
 %     end
- 
+%  
     update_state(iter,ctrl,plant_params, dt);
 
     time = time + dt;
@@ -139,65 +141,105 @@ end
 
 %% ************************ plot the trajectory *********************
 disp('Initializing figures...');
-
+start_point = 1;
+end_point = 1990;
 x = state.pos(1,:);
 y = state.pos(2,:);
 z = state.pos(3,:);
 
-% figure(1)
-% subplot(1,3,1);
-% plot(x);
-% hold on
-% subplot(1,3,2);
-% plot(y);
-% hold on
-% subplot(1,3,3);
-% plot(z);
-% hold on
-% 
-% 
-% figure(2)
-% subplot(1,3,1);
-% plot(des_state.pos(1,:));
-% hold on
-% subplot(1,3,2);
-% plot(des_state.pos(2,:));
-% hold on
-% subplot(1,3,3);
-% plot(des_state.pos(3,:));
-% hold on
-
-figure(3)
+figure(1)
 subplot(1,3,1);
-plot(state.vel(1,:));
+plot(x(start_point:end_point));
 hold on
+title("x")
 subplot(1,3,2);
-plot(state.vel(2,:));
+plot(y(start_point:end_point));
 hold on
+title("y")
 subplot(1,3,3);
-plot(state.vel(3,:));
+plot(z(start_point:end_point));
 hold on
+title("z")
 
-% figure(4)
+figure(1)
+subplot(1,3,1);
+plot(des_state.pos(1,start_point:end_point));
+hold on
+title("x")
+subplot(1,3,2);
+plot(des_state.pos(2,start_point:end_point));
+hold on
+title("y")
+subplot(1,3,3);
+plot(des_state.pos(3,start_point:end_point));
+hold on
+title("z")
+
+
+figure('Name', "error_pos")
+subplot(1,3,1);
+plot(des_state.pos(1,start_point:end_point)-state.pos(1,start_point:end_point));
+hold on
+title("error_x")
+subplot(1,3,2);
+plot(des_state.pos(2,start_point:end_point)-state.pos(2,start_point:end_point));
+hold on
+title("error_y")
+subplot(1,3,3);
+plot(des_state.pos(3,start_point:end_point)-state.pos(3,start_point:end_point));
+hold on
+title("error_z")
+
+% figure('Name',"error vel")
 % subplot(1,3,1);
-% plot(des_state.vel(1,:));
+% plot(des_state.vel(1,start_point:end_point)-state.vel(1,start_point:end_point));
 % hold on
+% title("error xvel")
 % subplot(1,3,2);
-% plot(des_state.vel(2,:));
+% plot(des_state.vel(2,start_point:end_point)-state.vel(2,start_point:end_point));
 % hold on
+% title("error yvel")
 % subplot(1,3,3);
-% plot(des_state.vel(3,:));
+% plot(des_state.vel(3,start_point:end_point)-state.vel(3,start_point:end_point));
 % hold on
+% title("error zvel")
 % 
-% figure(4)
+% 
+% figure('Name',"error rot")
 % subplot(1,3,1);
-% plot(x-des_state.pos(1,:));
+% plot(des_state.rot(1,start_point:end_point)-state.rot(1,start_point:end_point));
 % hold on
+% title("error phi")
+% 
 % subplot(1,3,2);
-% plot(y-des_state.pos(2,:));
+% plot(des_state.rot(2,start_point:end_point)-state.rot(2,start_point:end_point));
 % hold on
+% title("error theta")
+% 
 % subplot(1,3,3);
-% plot(z-des_state.pos(3,:));
+% plot(des_state.rot(3,start_point:end_point)-state.rot(3,start_point:end_point));
 % hold on
-
+% title("error yaw")
+% 
+% 
+% figure('Name', "error_omega")
+% subplot(1,3,1);
+% plot(des_state.omega(1,start_point:end_point)-state.omega(1,start_point:end_point));
+% hold on
+% title("error phivel")
+% 
+% subplot(1,3,2);
+% plot(des_state.omega(2,start_point:end_point)-state.omega(2,start_point:end_point));
+% hold on
+% title("error thetavel")
+% 
+% subplot(1,3,3);
+% plot(des_state.omega(3,start_point:end_point)-state.omega(3,start_point:end_point));
+% hold on
+% title("error yawvel")
+% 
+% 
+% figure(10)
+% plot(des_state.acc(3,start_point:end_point));
+% hold on
 

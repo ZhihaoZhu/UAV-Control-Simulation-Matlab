@@ -5,7 +5,7 @@ function traGenerator5(iter,time,T, T_start)
     
     %change the phi to set the destination yaw angle: either 0 or 15 deg
     phi = pi/12;
-    phi = 0;
+%     phi = 0;
     
     waypoint = [0  0  1 0;
                 0  0  0.1 phi];
