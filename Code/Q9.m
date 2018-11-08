@@ -69,7 +69,7 @@ time = 0; % initial time
 
 for iter = 1:N-2
 
-    traGenerator8_5(iter,time,end_time);
+    traGenerator9(iter,time,end_time);
     
     update_state(iter,ctrl,plant_params, dt);
 

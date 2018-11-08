@@ -3,8 +3,8 @@
 function traGenerator8_7(iter,time,T)
 	global des_state;
 	persistent Alpha
-    v1 = 10;
-    v2 = 14;
+    v1 = 2;
+    v2 = 2.8;
     a1 = 8.8;
     a2 = 2.5;
 	waypoint = [0  0  1 0;

@@ -1,9 +1,8 @@
 clear;
 clc;
-
 % Simulation times, in seconds. 
 start_time = 0; 
-end_time = 20; 
+end_time = 12; 
 dt = 0.01; 
 times = start_time:dt:end_time;
 N = numel(times);
@@ -62,87 +61,43 @@ state.pos(:,1) = init_pos;
 state.vel(:,1) = init_vel;
 state.wSpeed(:,1) = init_rpm;
 
-time = 0; 
+time = 0; % initial time
 
-
-current_state = 1;
-ready_to_land = false;
-target_iter_stamp = 0;
-
-
-%% tra_following simulation
+%% Simulation
 
 for iter = 1:N-2
 
-    if iter >= target_iter_stamp
-        switch current_state
-            case 1 % Take-off
-                takeoff(1, iter);
-                if arrived(state.pos(:, iter), des_state.pos(:, iter), 0.01) == true
-                    current_state = 2;
-                end
-
-            case 2 % Hover
-                % hover for 3 seconds
-                hover_time = 3;
-                num_iter = round(hover_time/dt, 0);
-                hover(num_iter, iter);
-                target_iter_stamp = iter + num_iter;    %%target_iter_stamp = 441
-                tracking_start = target_iter_stamp;
-
-                if ready_to_land
-                    current_state = 4;
-                    landing_start = iter*0.01+3;
-                else
-                    current_state = 3;
-                end
-
-            case 3 % Tracking
-%                 disp("tracking")  
-%                 disp(iter)
-                tracking_time = 10;
-                traGenerator10(iter, time, tracking_time, tracking_start);
-                if iter == tracking_start + round(tracking_time/dt, 0)
-                    ready_to_land = true;
-                    current_state = 2;
-                end
-                                   
-            case 4 % Land
-%                 disp(iter)
-                landing_time = 20-landing_start;
-                landing_10(iter,time,landing_time, round(landing_start/0.01,0));
-%                 land(iter); 
-%                 target_iter_stamp = N;
-        end
-    end
-
-    x1 = 1400;
-    x2 = 
-    if (iter>1400 && iter<1420) || (iter>1440 && iter<1466)
-        range = 5;
-        ctrl.Kp = [17 17 20]'/range;
-        ctrl.Kv = [6.6 6.6 9]'/range;
-        ctrl.Kr = [190 198 80]'/range;
-        ctrl.Kw = [30 30 17.88]'/range;
-    elseif iter>1420 && iter<1440
-        range = 5;
-        ctrl.Kp = [17 17 20]'/range;
-        ctrl.Kv = [6.6 6.6 9]'/range;
-        ctrl.Kr = [190 198 80]'/range;
-        ctrl.Kw = [30 30 17.88]'/range;
- 
-    else
-        ctrl.Kp = [17 17 20]';
-        ctrl.Kv = [6.6 6.6 9]';
-        ctrl.Kr = [190 198 80]';
-        ctrl.Kw = [30 30 17.88]';
-    end
-
-        
+    traGenerator8_7(iter,time,end_time);
+    
     update_state(iter,ctrl,plant_params, dt);
 
     time = time + dt;
 end
+
+%% ************************ Generate Animation *********************
+disp('Initializing figures...');
+h_fig = figure;
+h_3d = gca;
+axis equal
+grid on
+view(3);
+xlabel('x [m]'); ylabel('y [m]'); zlabel('z [m]')
+quadcolors = lines(1);
+set(gcf,'Renderer','OpenGL')
+
+time = 0;
+% initialize
+max_iter = N-2;
+for iter = 1:N-2
+    if iter == 1
+        s_plot = state2Plot(iter);
+        QP = QuadPlot(1, s_plot, plant_params.arm_length, 0.05,quadcolors(1,:), N-1, h_3d);
+        QP.UpdateQuadPlot(s_plot, [des_state.pos(:,iter); des_state.vel(:,iter)], time);
+    end 
+    s_plot = state2Plot(iter);
+    QP.UpdateQuadPlot(s_plot, [des_state.pos(:,iter); des_state.vel(:,iter)], time);
+end
+
 
 %% ************************ plot the trajectory *********************
 disp('Initializing figures...');
@@ -184,6 +139,17 @@ hold on
 subplot(1,3,3);
 plot(state.vel(3,:));
 hold on
+
+% figure(4)
+% subplot(1,3,1);
+% plot(des_state.vel(1,:));
+% hold on
+% subplot(1,3,2);
+% plot(des_state.vel(2,:));
+% hold on
+% subplot(1,3,3);
+% plot(des_state.vel(3,:));
+% hold on
 % 
 % figure(4)
 % subplot(1,3,1);
@@ -195,5 +161,3 @@ hold on
 % subplot(1,3,3);
 % plot(z-des_state.pos(3,:));
 % hold on
-
-
