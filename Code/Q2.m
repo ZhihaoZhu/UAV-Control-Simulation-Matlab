@@ -4,7 +4,7 @@ close all;
 
 % Simulation times, in seconds. 
 start_time = 0; 
-end_time = 20; 
+end_time = 5; 
 dt = 0.01; 
 times = start_time:dt:end_time;
 N = numel(times);
@@ -27,7 +27,7 @@ plant_params = struct(...
 ctrl = struct();
 
 ctrl.Kp = [17 17 20]';
-ctrl.Kv = [6.6 6.6 9]';
+ctrl.Kv = [6.6 6.6 18]';
 
 ctrl.Kr = [190 198 80]';
 ctrl.Kw = [30 30 17.88]';
@@ -37,7 +37,7 @@ ctrl.ct = plant_params.thrust_coefficient;
 ctrl.ms = ctrl.ct*plant_params.moment_scale;
 
 % initialize state X
-init_pos = [0; 0; 0];
+init_pos = [0; 0; 0.5];
 init_vel = zeros(3,1);
 init_rpm = plant_params.rpm_min*ones(4,1);
 
@@ -72,20 +72,8 @@ state.wSpeed(:,1) = init_rpm;
 time = 0; % initial time
 
 
-% %% Hover simulation
-% des_state.pos(3,:) = 0.5;
-% for iter = 1:N-2
-% 
-%     % generate the Force and Torque
-%     update_state(iter,ctrl,plant_params, dt);
-% 
-%     time = time + dt;
-% end
-%% x_tra simulation
-iter_interval = round(N/5,0);
-for ii = 1:5
-    des_state.pos(1,(ii-1)*iter_interval+1:ii*iter_interval) = ii*0.1;
-end
+%% Hover simulation
+des_state.pos(3,:) = 0.5;
 for iter = 1:N-2
 
     % generate the Force and Torque
@@ -93,6 +81,18 @@ for iter = 1:N-2
 
     time = time + dt;
 end
+% %% x_tra simulation
+% iter_interval = round(N/5,0);
+% for ii = 1:5
+%     des_state.pos(1,(ii-1)*iter_interval+1:ii*iter_interval) = ii*0.1;
+% end
+% for iter = 1:N-2
+% 
+%     % generate the Force and Torque
+%     update_state(iter,ctrl,plant_params, dt);
+% 
+%     time = time + dt;
+% end
 
 
 %% ************************ plot in desired range *********************
@@ -118,6 +118,8 @@ z = state.pos(3,:);
 figure(1)
 subplot(1,3,1);
 plot(x,'linewidth',1);
+ylim([-1 1])
+
 hold on
 plot(des_state.pos(1,:),'linewidth',1);
 xlabel('(0.01 s)','FontSize',10);
@@ -149,6 +151,8 @@ title("z")
 figure('Name', "error_pos")
 subplot(1,3,1);
 plot(des_state.pos(1,:)-state.pos(1,:),'linewidth',1);
+ylim([-1 1])
+
 xlabel('(0.01 s)','FontSize',10);
 ylabel('(m)','FontSize',10);
 hold on
