@@ -4,7 +4,7 @@ close all;
 
 % Simulation times, in seconds. 
 start_time = 0; 
-end_time = 10; 
+end_time = 4.5; 
 dt = 0.01; 
 times = start_time:dt:end_time;
 N = numel(times);
@@ -221,6 +221,28 @@ xlabel('(0.01 s)','FontSize',10);
 ylabel('(rad/s)','FontSize',10);
 hold on
 title("error yaw vel")
+
+
+figure('Name', "omega")
+subplot(1,3,1);
+plot(des_state.omega(1,start_point:end_point),'linewidth',1);
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad/s)','FontSize',10);
+hold on
+title("phi vel")
+subplot(1,3,2);
+plot(des_state.omega(2,start_point:end_point),'linewidth',1);
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad/s)','FontSize',10);
+hold on
+title("theta vel")
+subplot(1,3,3);
+plot(des_state.omega(3,start_point:end_point),'linewidth',1);
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad/s)','FontSize',10);
+hold on
+title("yaw vel")
+
 
 figure(5)
 plot(des_state.omega(3,start_point:end_point));
