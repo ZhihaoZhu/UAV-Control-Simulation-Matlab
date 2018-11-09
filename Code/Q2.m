@@ -170,6 +170,33 @@ xlabel('(0.01 s)','FontSize',10);
 ylabel('(m)','FontSize',10);
 hold on
 title("error_z")
+
+start_point = 1;
+end_point = 499;
+figure('Name', "error_rot")
+subplot(1,3,1);
+plot(des_state.rot(1,start_point:end_point)-state.rot(1,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad)','FontSize',10);
+hold on
+title("error phi")
+subplot(1,3,2);
+plot(des_state.rot(2,start_point:end_point)-state.rot(2,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad)','FontSize',10);
+hold on
+title("error theta")
+subplot(1,3,3);
+plot(des_state.rot(3,start_point:end_point)-state.rot(3,start_point:end_point),'linewidth',1);
+ylim([-1 1])
+xlabel('(0.01 s)','FontSize',10);
+ylabel('(rad)','FontSize',10);
+hold on
+title("error yaw")
+
+
 % 
 % figure('Name',"error_vel")
 % subplot(1,3,1);
